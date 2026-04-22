@@ -1,8 +1,11 @@
 # Vanta
 
-<p align="center">
-  <img src="assets/logo.png" alt="Vanta logo" width="600" />
-</p>
+[![HTTP Proxy](https://img.shields.io/badge/http%20proxy-mitm%20gateway-2e86de?style=flat-square&logo=shield)](https://github.com/darks0l/VantaProxy)
+[![Go](https://img.shields.io/badge/go-1.26-blue?style=flat-square&logo=go)](https://go.dev/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow?style=flat-square)](./LICENSE)
+[![Built with teeth](https://img.shields.io/badge/built%20with-teeth%20🌑-black?style=flat-square)](https://darksol.net)
+
+![Vanta Banner](assets/darksol-banner.png)
 
 > HTTP proxy with teeth. Built by Darksol.
 
@@ -24,8 +27,8 @@ If you run AI agents that call external services — Slack, Gmail, GitHub, DeFi 
 
 ```bash
 # Clone
-git clone https://github.com/darksol/Vanta.git
-cd Vanta
+git clone https://github.com/darks0l/VantaProxy.git
+cd VantaProxy
 
 # Configure
 cp config/gateway.yaml.example config/gateway.yaml
