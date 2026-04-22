@@ -46,10 +46,10 @@ database:
 # features (evals, policy agent) even when approval.mode is passthrough.
 llm_judge:
   enabled: true
-  provider: bedrock-anthropic     # "bedrock-anthropic" | "anthropic" | "openai"
-  eval_model: anthropic.claude-opus-4-5-20251101-v2:0
-  fast_model: anthropic.claude-haiku-4-5-20251001
-  thinking_model: anthropic.claude-opus-4-5-20251101-v2:0
+  provider: bankr                 # bankr | anthropic | openai | bedrock-anthropic
+  eval_model: anthropic/claude-opus-4-6
+  fast_model: anthropic/claude-haiku-4-6
+  thinking_model: anthropic/claude-opus-4-6
   bedrock_aws_region: us-east-1     # Optional: overrides AWS_REGION env var (bedrock-anthropic only)
   timeout: 30s
   fallback_mode: deny             # deny | passthrough

@@ -35,7 +35,7 @@ func serveWebUI(devMode bool) http.Handler {
 				w.Header().Set("Content-Type", "text/html")
 				w.Write([]byte(`<!DOCTYPE html>
 <html>
-<head><title>CrabTrap</title></head>
+<head><title>Vanta</title></head>
 <body>
 	<h1>Development Mode</h1>
 	<p>Web UI not built yet. Choose one of:</p>

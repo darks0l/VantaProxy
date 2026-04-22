@@ -424,7 +424,7 @@ func extractProxyAuth(header string) (proxyAuth, error) {
 func unsupportedAuthSchemeResponse() *http.Response {
 	body := []byte("Unsupported proxy authentication scheme. Only Basic authentication is supported. Set Proxy-Authorization: Basic base64(gat_xxx:) or HTTP_PROXY=http://gat_xxx:@host:port")
 	h := make(http.Header)
-	h.Set("Proxy-Authenticate", `Basic realm="CrabTrap"`)
+	h.Set("Proxy-Authenticate", `Basic realm="Vanta"`)
 	h.Set("Content-Type", "text/plain")
 	h.Set("Connection", "close")
 	return &http.Response{
@@ -443,7 +443,7 @@ func unsupportedAuthSchemeResponse() *http.Response {
 func proxyAuthRequiredResponse() *http.Response {
 	body := []byte("Proxy authentication required. Set Proxy-Authorization: Basic base64(gat_xxx:) or HTTP_PROXY=http://gat_xxx:@host:port")
 	h := make(http.Header)
-	h.Set("Proxy-Authenticate", `Basic realm="CrabTrap"`)
+	h.Set("Proxy-Authenticate", `Basic realm="Vanta"`)
 	h.Set("Content-Type", "text/plain")
 	h.Set("Connection", "close")
 	return &http.Response{
@@ -487,7 +487,7 @@ func (h *Handler) handleConnect(w http.ResponseWriter, r *http.Request, requestI
 	tunnelAuth, authErr := extractProxyAuth(r.Header.Get("Proxy-Authorization"))
 	if authErr != nil {
 		slog.Warn("CONNECT unsupported auth scheme, returning 407", "request_id", requestID)
-		w.Header().Set("Proxy-Authenticate", `Basic realm="CrabTrap"`)
+		w.Header().Set("Proxy-Authenticate", `Basic realm="Vanta"`)
 		http.Error(w, "Unsupported proxy authentication scheme. Only Basic authentication is supported. Set Proxy-Authorization: Basic base64(gat_xxx:) or HTTP_PROXY=http://gat_xxx:@host:port", http.StatusProxyAuthRequired)
 		return
 	}
@@ -498,13 +498,13 @@ func (h *Handler) handleConnect(w http.ResponseWriter, r *http.Request, requestI
 	if h.userResolver != nil {
 		if tunnelAuth.gatewayToken == "" {
 			slog.Warn("CONNECT gateway auth missing, returning 407", "request_id", requestID)
-			w.Header().Set("Proxy-Authenticate", `Basic realm="CrabTrap"`)
+			w.Header().Set("Proxy-Authenticate", `Basic realm="Vanta"`)
 			http.Error(w, "Proxy authentication required. Set Proxy-Authorization: Basic base64(gat_xxx:) or HTTP_PROXY=http://gat_xxx:@host:port", http.StatusProxyAuthRequired)
 			return
 		}
 		if _, ok := h.userResolver.GetUserByGatewayAuthToken(tunnelAuth.gatewayToken); !ok {
 			slog.Warn("CONNECT gateway auth token invalid, returning 407", "request_id", requestID)
-			w.Header().Set("Proxy-Authenticate", `Basic realm="CrabTrap"`)
+			w.Header().Set("Proxy-Authenticate", `Basic realm="Vanta"`)
 			http.Error(w, "Proxy authentication required. Set Proxy-Authorization: Basic base64(gat_xxx:) or HTTP_PROXY=http://gat_xxx:@host:port", http.StatusProxyAuthRequired)
 			return
 		}
@@ -721,7 +721,7 @@ func (h *Handler) handleHTTP(w http.ResponseWriter, r *http.Request, requestID s
 	// RFC 7235 requires on 407 responses.
 	if _, authErr := extractProxyAuth(r.Header.Get("Proxy-Authorization")); authErr != nil {
 		slog.Warn("unsupported auth scheme, returning 407", "request_id", requestID)
-		w.Header().Set("Proxy-Authenticate", `Basic realm="CrabTrap"`)
+		w.Header().Set("Proxy-Authenticate", `Basic realm="Vanta"`)
 		http.Error(w, "Unsupported proxy authentication scheme. Only Basic authentication is supported. Set Proxy-Authorization: Basic base64(gat_xxx:) or HTTP_PROXY=http://gat_xxx:@host:port", http.StatusProxyAuthRequired)
 		return
 	}

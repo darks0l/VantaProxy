@@ -87,7 +87,7 @@ type LLMJudgeConfig struct {
 	OpenAIBaseURL           string        `yaml:"openai_base_url"`           // override OpenAI API base URL (e.g. for proxies)
 	// Bankr-specific config
 	BankrURL                string        `yaml:"bankr_url"`                 // Bankr gateway URL (default: http://localhost:18789)
-	BankrAPIKey            string        `yaml:"bankr_api_key"`             // Bankr API key (or env BANRK_API_KEY)
+	BankrAPIKey            string        `yaml:"bankr_api_key"`             // Bankr API key (or env BANKR_API_KEY)
 }
 
 // AuditConfig contains audit logging settings
@@ -181,7 +181,7 @@ func (c *Config) applyDefaults() {
 		c.Approval.Timeout = 30 * time.Second
 	}
 	if c.LLMJudge.Provider == "" {
-		c.LLMJudge.Provider = "bedrock-anthropic"
+		c.LLMJudge.Provider = "bankr"
 	}
 	if c.LLMJudge.BedrockAWSRegion == "" && c.LLMJudge.AWSRegion != "" {
 		c.LLMJudge.BedrockAWSRegion = c.LLMJudge.AWSRegion
@@ -202,10 +202,10 @@ func (c *Config) applyDefaults() {
 		c.LLMJudge.BankrAPIKey = os.Getenv("BANKR_API_KEY")
 	}
 	if c.LLMJudge.EvalModel == "" {
-		c.LLMJudge.EvalModel = "anthropic.claude-opus-4-5-20251101-v2:0"
+		c.LLMJudge.EvalModel = "anthropic/claude-opus-4-6"
 	}
 	if c.LLMJudge.FastModel == "" {
-		c.LLMJudge.FastModel = "anthropic.claude-haiku-4-5-20251001"
+		c.LLMJudge.FastModel = "anthropic/claude-haiku-4-6"
 	}
 	if c.LLMJudge.ThinkingModel == "" {
 		c.LLMJudge.ThinkingModel = c.LLMJudge.EvalModel

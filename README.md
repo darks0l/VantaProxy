@@ -13,15 +13,12 @@ An HTTP/HTTPS proxy that sits between AI agents and external APIs, evaluating ev
 
 If you run AI agents that call external services — Slack, Gmail, GitHub, DeFi protocols, RPC endpoints, or anything else — Vanta gives you guardrails. It intercepts every outbound HTTP/HTTPS request, checks it against deterministic rules and an LLM-based policy judge, and either forwards it or blocks it with a reason.
 
-**Key differences from CrabTrap:**
+**Key features:**
 - **Bankr LLM gateway** — routes through OpenAI, Anthropic, Ollama, or OpenRouter with automatic fallback chains and budget guards
-- **Web3-native** — static rules for DeFi protocols, RPC endpoints, smart contract interactions, and wallet safety
+- **Static rules** — URL pattern-based allowlist/denylist before the judge runs
+- **LLM judge** — per-request policy evaluation with OpenAI-compatible model IDs
 - **Local-model ready** — runs the judge on your own hardware via Ollama
-- **SQLite-first** — zero-infrastructure deployment option
-
-<p align="center">
-  <img src="docs/vanta-flow.svg" alt="Vanta request flow" width="800" />
-</p>
+- **Full audit trail** — every decision logged with request/response bodies
 
 ## Quickstart
 
@@ -65,33 +62,6 @@ llm_judge:
   bankr_api_key: "local"
   bankr_url: "http://localhost:18789"
   eval_model: "ollama/gemma4:26b"
-```
-
-## Web3 Security Rules
-
-Vanta ships with Web3-specific static rules out of the box:
-
-- **RPC endpoint allowlisting** — per-chain (Ethereum, Base, Arbitrum, Optimism, Solana)
-- **Known malicious contract detection** — honeypots, scam tokens, bridge exploits
-- **Token approval monitoring** — detect unbounded approvals to unknown contracts
-- **Flash loan protection** — block known flash loan attack patterns
-- **Wallet interaction rules** — raw transaction construction, permit signatures, permit2
-
-Configure Web3 rules in `config/web3-rules.yaml`:
-
-```yaml
-allowed_rpc:
-  - "https://mainnet.base.org"
-  - "https://base-mainnet.g.alchemy.com/v4/${ALCHEMY_API_KEY}"
-
-blocked_contracts:
-  - address: "0x..."
-    reason: "honeypot token"
-    chains: ["ethereum", "base"]
-
-max_approval_value:
-  default: "unlimited"  # or specify a uint256 value
-  require_explicit_approval_above: "1000000000000000000"  # 1 ETH equivalent
 ```
 
 ## Architecture
