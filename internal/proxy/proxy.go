@@ -117,7 +117,7 @@ func (s *Server) Start() error {
 		IdleTimeout:  s.config.Proxy.IdleTimeout,
 	}
 
-	slog.Info("starting CrabTrap", "port", s.config.Proxy.Port)
+	slog.Info("starting Vanta", "port", s.config.Proxy.Port)
 	slog.Info("approval timeout configured", "timeout", s.config.Approval.Timeout)
 
 	// Start server

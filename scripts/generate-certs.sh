@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# CrabTrap - CA Certificate Generation Script
+# Vanta - CA Certificate Generation Script
 # This script generates a self-signed CA certificate for TLS interception
 
 # Get the project root (one level up from scripts/)
@@ -14,7 +14,7 @@ mkdir -p "$CERT_DIR"
 cd "$CERT_DIR"
 
 echo "=========================================="
-echo "CrabTrap - CA Certificate Setup"
+echo "Vanta - CA Certificate Setup"
 echo "=========================================="
 echo ""
 
@@ -27,7 +27,7 @@ openssl genrsa -out ca.key 4096 2>/dev/null
 
 echo "  → Generating CA certificate (valid 10 years)..."
 openssl req -new -x509 -days 3650 -key ca.key -out ca.crt \
-  -subj "/C=US/ST=California/L=San Francisco/O=CrabTrap/CN=CrabTrap CA" 2>/dev/null
+  -subj "/C=US/ST=California/L=San Francisco/O=Vanta/CN=Vanta CA" 2>/dev/null
 
 echo "  → Setting permissions..."
 chmod 600 ca.key
@@ -86,7 +86,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo ""
         echo "  → Removing old certificate (if exists)..."
-        security delete-certificate -c "CrabTrap CA" 2>/dev/null || true
+        security delete-certificate -c "Vanta CA" 2>/dev/null || true
 
         echo "  → Installing certificate with full trust in system keychain..."
         if sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "$CERT_DIR/ca.crt"; then
@@ -94,7 +94,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
             echo "✓ Certificate installed successfully!"
             echo ""
             echo "Verification:"
-            security find-certificate -c "CrabTrap CA" -p | openssl x509 -noout -subject 2>/dev/null
+            security find-certificate -c "Vanta CA" -p | openssl x509 -noout -subject 2>/dev/null
         else
             echo ""
             echo "⚠ Failed to install certificate in system keychain."
@@ -123,7 +123,7 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo ""
         echo "  → Copying certificate to /usr/local/share/ca-certificates/..."
-        sudo cp "$CERT_DIR/ca.crt" /usr/local/share/ca-certificates/openclaw-gateway.crt
+        sudo cp "$CERT_DIR/ca.crt" /usr/local/share/ca-certificates/vanta.crt
 
         echo "  → Updating CA certificates..."
         sudo update-ca-certificates
@@ -135,7 +135,7 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
         echo "⚠ Skipping automatic installation."
         echo ""
         echo "To install manually later, run:"
-        echo "  sudo cp $CERT_DIR/ca.crt /usr/local/share/ca-certificates/openclaw-gateway.crt"
+        echo "  sudo cp $CERT_DIR/ca.crt /usr/local/share/ca-certificates/vanta.crt"
         echo "  sudo update-ca-certificates"
     fi
 

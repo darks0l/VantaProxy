@@ -65,8 +65,8 @@ func EnsureCACertificate(certPath, keyPath string) error {
 	template := x509.Certificate{
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
-			CommonName:   "CrabTrap CA",
-			Organization: []string{"CrabTrap"},
+			CommonName:   "Vanta CA",
+			Organization: []string{"Vanta"},
 		},
 		// Back-date by 1 hour to tolerate clock skew on client machines.
 		NotBefore:             time.Now().Add(-1 * time.Hour),
@@ -287,7 +287,7 @@ func (tm *TLSManager) generateCertificate(host string) (*tls.Certificate, error)
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
 			CommonName:   host,
-			Organization: []string{"CrabTrap"},
+			Organization: []string{"Vanta"},
 		},
 		NotBefore:   time.Now().Add(-1 * time.Hour),
 		NotAfter:    time.Now().Add(365 * 24 * time.Hour),

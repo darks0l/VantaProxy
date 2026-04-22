@@ -1,28 +1,29 @@
 services:
-  crabtrap:
-    image: quay.io/brexhq/crabtrap:latest
+  vantaproxy:
+    build: .
     ports:
       - "8080:8080"
       - "8081:8081"
     environment:
-      DATABASE_URL: postgres://crabtrap:secret@postgres:5432/crabtrap
+      DATABASE_URL: postgres://vantaproxy:secret@postgres:5432/vantaproxy
     volumes:
       - certs:/app/certs
     depends_on:
       postgres:
         condition: service_healthy
+
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_DB: crabtrap
-      POSTGRES_USER: crabtrap
+      POSTGRES_DB: vantaproxy
+      POSTGRES_USER: vantaproxy
       POSTGRES_PASSWORD: secret
     ports:
       - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U crabtrap -d crabtrap"]
+      test: ["CMD-SHELL", "pg_isready -U vantaproxy -d vantaproxy"]
       interval: 5s
       timeout: 5s
       retries: 5

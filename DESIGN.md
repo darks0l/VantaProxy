@@ -1,8 +1,8 @@
-# CrabTrap - Design Document
+# Vanta - Design Document
 
 ## Overview
 
-The CrabTrap is a security mesh that intercepts all external API calls from AI agent instances (e.g. AI agents), providing centralized control over write operations and audit logging.
+The Vanta is a security mesh that intercepts all external API calls from AI agent instances (e.g. AI agents), providing centralized control over write operations and audit logging.
 
 Two core security guarantees:
 1. **Write Operation Safety** — No agent can modify external systems (send emails, create calendar events, delete documents) without passing the LLM policy judge.
@@ -213,11 +213,11 @@ The fallback mode is configurable per deployment (`deny` or `passthrough`).
 
 The LLM judge receives the full HTTP request verbatim — headers and body are not sanitized or redacted. This is a deliberate design decision:
 
-- **CrabTrap is a MiTM proxy.** It terminates TLS and already sees all traffic in cleartext, including credentials. The audit log records full request metadata. Redacting content before LLM evaluation does not reduce the trust boundary — it is already inside it.
+- **Vanta is a MiTM proxy.** It terminates TLS and already sees all traffic in cleartext, including credentials. The audit log records full request metadata. Redacting content before LLM evaluation does not reduce the trust boundary — it is already inside it.
 - **Redaction cannot be done correctly.** APIs do not use consistent headers for authentication. Credentials appear in `Authorization`, `Cookie`, `X-Api-Key`, custom headers, query parameters, and request bodies. Any blocklist will be incomplete and give a false sense of security.
 - **Redaction degrades policy decisions.** The judge needs full context to make accurate allow/deny decisions. Stripping headers or body content makes the LLM blind to signals it may need.
 
-The appropriate controls are on the LLM provider side (data processing agreements, retention policies) and on access to the CrabTrap deployment itself (network isolation, admin authentication).
+The appropriate controls are on the LLM provider side (data processing agreements, retention policies) and on access to the Vanta deployment itself (network isolation, admin authentication).
 
 ### Request body decompression
 

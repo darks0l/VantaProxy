@@ -644,8 +644,8 @@ func TestEnsureCACertificate_GeneratesWhenMissing(t *testing.T) {
 	if !cert.IsCA {
 		t.Error("generated cert is not a CA")
 	}
-	if cert.Subject.CommonName != "CrabTrap CA" {
-		t.Errorf("CN = %q, want %q", cert.Subject.CommonName, "CrabTrap CA")
+	if cert.Subject.CommonName != "Vanta CA" {
+		t.Errorf("CN = %q, want %q", cert.Subject.CommonName, "Vanta CA")
 	}
 
 	// Verify the key is parseable.

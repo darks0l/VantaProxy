@@ -8,7 +8,7 @@ import (
 )
 
 func TestConfigurePoolConfigUsesCacheDescribeQueryMode(t *testing.T) {
-	cfg, err := pgxpool.ParseConfig("postgres://crabtrap:secret@localhost:5432/crabtrap?sslmode=disable")
+	cfg, err := pgxpool.ParseConfig("postgres://vantaproxy:secret@localhost:5432/vantaproxy?sslmode=disable")
 	if err != nil {
 		t.Fatalf("ParseConfig failed: %v", err)
 	}
@@ -27,7 +27,7 @@ func TestConfigurePoolConfigUsesCacheDescribeQueryMode(t *testing.T) {
 }
 
 func TestConfigurePoolConfigUsesDefaultPoolSizes(t *testing.T) {
-	cfg, err := pgxpool.ParseConfig("postgres://crabtrap:secret@localhost:5432/crabtrap?sslmode=disable")
+	cfg, err := pgxpool.ParseConfig("postgres://vantaproxy:secret@localhost:5432/vantaproxy?sslmode=disable")
 	if err != nil {
 		t.Fatalf("ParseConfig failed: %v", err)
 	}

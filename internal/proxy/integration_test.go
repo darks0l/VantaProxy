@@ -104,7 +104,7 @@ func TestEndToEndReadOperation(t *testing.T) {
 }
 
 // TestEndToEndUnmanagedWritePassThrough verifies that in passthrough mode,
-// write requests that do not use CrabTrap-managed credentials are allowed
+// write requests that do not use Vanta-managed credentials are allowed
 // through without approval.
 func TestEndToEndUnmanagedWritePassThrough(t *testing.T) {
 	const testUserID = "unmanaged-pass-through@example.com"

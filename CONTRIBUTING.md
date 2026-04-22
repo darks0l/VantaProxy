@@ -1,10 +1,10 @@
-# Contributing to CrabTrap
+# Contributing to Vanta
 
-Thank you for your interest in contributing to CrabTrap! This document explains how to get started, the development workflow, and the guidelines we follow.
+Thank you for your interest in contributing to Vanta! This document explains how to get started, the development workflow, and the guidelines we follow.
 
 ## Code of Conduct
 
-Be respectful and constructive. We want CrabTrap to be a welcoming project for everyone.
+Be respectful and constructive. We want Vanta to be a welcoming project for everyone.
 
 ## Getting Started
 
@@ -20,8 +20,8 @@ Be respectful and constructive. We want CrabTrap to be a welcoming project for e
 
 ```bash
 # Clone the repository
-git clone https://github.com/brexhq/CrabTrap.git
-cd CrabTrap
+git clone https://github.com/brexhq/Vanta.git
+cd Vanta
 
 # Generate CA certificates
 make gen-certs
@@ -65,7 +65,7 @@ See the [README](README.md) for more details on configuration and usage.
 ## Project Structure
 
 ```
-crabtrap/
+vantaproxy/
 ├── cmd/gateway/          # Main entry point, admin API wiring, web UI serving
 ├── internal/             # Core packages (proxy, approval, config, judge, llm, eval, …)
 ├── pkg/types/            # Shared exported types
@@ -126,7 +126,7 @@ Releases are managed by [GoReleaser](https://goreleaser.com/) (`.goreleaser.yaml
 1. Build `gateway` binaries for linux/darwin (amd64/arm64)
 2. Generate a changelog from commit history
 3. Create a GitHub Release with binary archives and checksums
-4. Build and push multi-arch Docker images to `quay.io/brexhq/crabtrap`
+4. Build and push multi-arch Docker images to `quay.io/brexhq/vantaproxy`
 
 #### Creating a release
 
@@ -173,7 +173,7 @@ goreleaser release --clean
 
 ## Reporting Issues
 
-Open an issue at <https://github.com/brexhq/CrabTrap/issues> with:
+Open an issue at <https://github.com/brexhq/Vanta/issues> with:
 
 - A clear title and description.
 - Steps to reproduce the problem.
@@ -182,4 +182,4 @@ Open an issue at <https://github.com/brexhq/CrabTrap/issues> with:
 
 ## License
 
-By contributing to CrabTrap you agree that your contributions will be licensed under the [MIT License](LICENSE).
+By contributing to Vanta you agree that your contributions will be licensed under the [MIT License](LICENSE).

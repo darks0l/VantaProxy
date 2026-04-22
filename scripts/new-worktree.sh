@@ -8,7 +8,7 @@ fi
 
 BRANCH="$1"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-TARGET="$(dirname "$REPO_ROOT")/CrabTrap-${BRANCH}"
+TARGET="$(dirname "$REPO_ROOT")/Vanta-${BRANCH}"
 
 git -C "$REPO_ROOT" worktree add "$TARGET" -B "$BRANCH"
 

@@ -18,9 +18,9 @@
   <text x="85" y="129" text-anchor="middle" fill="#f8fafc" font-size="13" font-weight="600">AI Agent</text>
   <text x="85" y="147" text-anchor="middle" fill="#94a3b8" font-size="10">HTTP_PROXY set</text>
 
-  <!-- CrabTrap boundary -->
+  <!-- Vanta boundary -->
   <rect x="185" y="15" width="520" height="300" rx="10" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,4"/>
-  <text x="445" y="35" text-anchor="middle" fill="#475569" font-size="13" font-weight="700" letter-spacing="0.5">CRABTRAP</text>
+  <text x="445" y="35" text-anchor="middle" fill="#475569" font-size="13" font-weight="700" letter-spacing="0.5">Vanta</text>
 
   <!-- TLS -->
   <rect x="210" y="110" width="110" height="44" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
@@ -64,7 +64,7 @@
   <line x1="630" y1="132" x2="738" y2="132" stroke="#16a34a" stroke-width="1.5" marker-end="url(#arr-g)"/>
   <text x="684" y="124" text-anchor="middle" fill="#16a34a" font-size="10" font-weight="600">ALLOW</text>
 
-  <!-- Response: API → Agent (inside CrabTrap boundary) -->
+  <!-- Response: API → Agent (inside Vanta boundary) -->
   <polyline points="807,105 807,52 85,52 85,105" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arr-g)"/>
   <text x="445" y="47" text-anchor="middle" fill="#16a34a" font-size="10">response</text>
 

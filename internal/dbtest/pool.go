@@ -71,8 +71,8 @@ func setupContainer() (*pgxpool.Pool, func(), error) {
 
 	ctr, err := tcpostgres.Run(ctx,
 		"postgres:17-alpine",
-		tcpostgres.WithDatabase("crabtrap_test"),
-		tcpostgres.WithUsername("crabtrap"),
+		tcpostgres.WithDatabase("vantaproxy_test"),
+		tcpostgres.WithUsername("vantaproxy",
 		tcpostgres.WithPassword("secret"),
 		tcpostgres.BasicWaitStrategies(),
 	)

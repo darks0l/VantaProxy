@@ -1,6 +1,6 @@
 # Quick Start
 
-Get CrabTrap running in under 2 minutes with Docker.
+Get Vanta running in under 2 minutes with Docker.
 
 ## 1. Create a compose file
 
@@ -8,13 +8,13 @@ Save this as `docker-compose.yml`:
 
 ```yaml
 services:
-  crabtrap:
-    image: quay.io/brexhq/crabtrap:latest
+  vantaproxy:
+    image: quay.io/brexhq/vantaproxy:latest
     ports:
       - "8080:8080"
       - "8081:8081"
     environment:
-      DATABASE_URL: postgres://crabtrap:secret@postgres:5432/crabtrap
+      DATABASE_URL: postgres://vantaproxy:secret@postgres:5432/vantaproxy
     volumes:
       - certs:/app/certs
     depends_on:
@@ -24,13 +24,13 @@ services:
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_DB: crabtrap
-      POSTGRES_USER: crabtrap
+      POSTGRES_DB: vantaproxy
+      POSTGRES_USER: vantaproxy
       POSTGRES_PASSWORD: secret
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U crabtrap -d crabtrap"]
+      test: ["CMD-SHELL", "pg_isready -U vantaproxy -d vantaproxy"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -40,7 +40,7 @@ volumes:
   postgres_data:
 ```
 
-## 2. Start CrabTrap
+## 2. Start Vanta
 
 ```bash
 docker compose up -d
@@ -54,7 +54,7 @@ The CA certificate is generated automatically on first run.
 ## 3. Create Admin User and store its token in $web_token bash variable
 
 ```
-admin_token=$(docker compose exec -it crabtrap ./gateway create-admin-user test-admin \
+admin_token=$(docker compose exec -it vantaproxy ./gateway create-admin-user test-admin \
     | tail -n1 | cut -d" " -f2)
 ```
 
@@ -72,12 +72,12 @@ curl -X POST http://localhost:8081/admin/users \
 Copy the auto-generated CA certificate out of the container:
 
 ```bash
-docker compose cp crabtrap:/app/certs/ca.crt ./ca.crt
+docker compose cp vantaproxy:/app/certs/ca.crt ./ca.crt
 ```
 
 ## 6. Trust the CA certificate
 
-Your agent needs to trust CrabTrap's CA so it can decrypt HTTPS traffic. Pick one approach:
+Your agent needs to trust Vanta's CA so it can decrypt HTTPS traffic. Pick one approach:
 
 **Option A — per-runtime env var** (scoped, no `sudo` required):
 
@@ -94,7 +94,7 @@ sudo security add-trusted-cert -d -r trustRoot \
   -k /Library/Keychains/System.keychain ca.crt
 
 # Linux (Debian/Ubuntu)
-sudo cp ca.crt /usr/local/share/ca-certificates/crabtrap.crt
+sudo cp ca.crt /usr/local/share/ca-certificates/vantaproxy.crt
 sudo update-ca-certificates
 ```
 
@@ -122,7 +122,7 @@ curl -x http://${token}:@localhost:8080 --cacert ca.crt https://httpbin.org/get
 
 ## Configuration
 
-Without a config file, CrabTrap starts in **passthrough mode** — all requests are allowed and logged. To enable LLM-based policy enforcement, create a config file:
+Without a config file, Vanta starts in **passthrough mode** — all requests are allowed and logged. To enable LLM-based policy enforcement, create a config file:
 
 ```yaml
 # gateway.yaml
@@ -136,10 +136,10 @@ llm_judge:
   aws_region: us-west-2
 
 database:
-  url: postgres://crabtrap:secret@postgres:5432/crabtrap
+  url: postgres://vantaproxy:secret@postgres:5432/vantaproxy
 ```
 
-Mount it in your compose file by adding to `crabtrap.volumes`:
+Mount it in your compose file by adding to `vantaproxy.volumes`:
 
 ```yaml
 - ./gateway.yaml:/app/config/gateway.yaml
@@ -154,8 +154,8 @@ See [`config/gateway.yaml.example`](config/gateway.yaml.example) for the full re
 To build from source (for contributing or customization):
 
 ```bash
-git clone https://github.com/brexhq/CrabTrap.git
-cd CrabTrap
+git clone https://github.com/brexhq/Vanta.git
+cd Vanta
 make setup    # generates CA certs + builds binary
 make dev      # starts PostgreSQL, backend, and frontend with hot-reload
 ```

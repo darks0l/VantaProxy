@@ -35,7 +35,7 @@ admin:
   secure_cookie: false  # set true when served behind a TLS-terminating reverse proxy
 
 database:
-  url: "${DATABASE_URL}"  # e.g. postgres://crabtrap:secret@localhost:5432/crabtrap
+  url: "${DATABASE_URL}"  # e.g. postgres://vantaproxy:secret@localhost:5432/vantaproxy
   max_conns: 10
   min_conns: 2
 
@@ -82,3 +82,69 @@ llm_judge:
   #   fast_model: gpt-4o-mini
   #   thinking_model: gpt-4o
   #   openai_api_key: "${OPENAI_API_KEY}"
+
+# --- Web3 Security Rules ---
+# Fast-path deterministic checks that run BEFORE the LLM judge.
+# Covers: RPC endpoint validation, chain enforcement, contract denylist,
+# ETH value thresholds, and gas price limits.
+web3:
+  enabled: true
+  log_all_web3: false  # set true to log every Web3 request at info level
+
+  # Allowed RPC endpoints with per-endpoint overrides.
+  rpcs:
+    # Ethereum mainnet — free public RPCs
+    - url: https://eth.llamarpc.com
+      chain_id: 1
+      chain_name: Ethereum
+      value_warn_eth: 0.1    # warn above 0.1 ETH
+      value_deny_eth: 1.0    # deny above 1.0 ETH
+      max_gas_gwei: 200      # deny if gas > 200 gwei
+
+    # Ethereum mainnet — Alchemy (replace with your API key)
+    - url: https://eth-mainnet.g.alchemy.com/v2/YOUR_API_KEY
+      chain_id: 1
+      chain_name: Ethereum (Alchemy)
+      value_warn_eth: 0.5
+      value_deny_eth: 5.0
+      max_gas_gwei: 300
+
+    # Base mainnet
+    - url: https://base.llamarpc.com
+      chain_id: 8453
+      chain_name: Base
+      value_warn_eth: 0.1
+      value_deny_eth: 2.0
+
+    # Arbitrum One
+    - url: https://arbitrum.llamarpc.com
+      chain_id: 42161
+      chain_name: Arbitrum One
+      value_warn_eth: 0.1
+      value_deny_eth: 2.0
+
+    # Polygon
+    - url: https://polygon.llamarpc.com
+      chain_id: 137
+      chain_name: Polygon
+      value_warn_eth: 500   # MATIC is cheaper; higher threshold
+      value_deny_eth: 5000
+
+    # Base Sepolia (testnet)
+    - url: https://base-sepolia.llamarpc.com
+      chain_id: 84532
+      chain_name: Base Sepolia
+      # No value limits on testnet
+
+  # Allowed chain IDs for all users. Empty = all chains allowed.
+  # Use this to restrict agents to specific chains.
+  # Example: only allow Base and Arbitrum
+  # allowed_chains: [8453, 42161]
+
+  # Denied chain IDs (checked after allowlist).
+  # denied_chains: []
+
+  # Additional contract denylist entries beyond the built-in list.
+  # Entries are lowercased before comparison. Both hex with and without 0x accepted.
+  # danger_denylist:
+  #   - "0xd8da6bf26964af9d7eed9e03e53415d87aa480bb"  # example phishing contract

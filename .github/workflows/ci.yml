@@ -42,18 +42,18 @@ jobs:
       postgres:
         image: postgres:17-alpine
         env:
-          POSTGRES_DB: crabtrap_test
-          POSTGRES_USER: crabtrap
+          POSTGRES_DB: vantaproxy_test
+          POSTGRES_USER: vantaproxy
           POSTGRES_PASSWORD: secret
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U crabtrap -d crabtrap_test"
+          --health-cmd "pg_isready -U vantaproxy -d vantaproxy_test"
           --health-interval 2s
           --health-timeout 5s
           --health-retries 10
     env:
-      TEST_DATABASE_URL: postgres://crabtrap:secret@localhost:5432/crabtrap_test
+      TEST_DATABASE_URL: postgres://vantaproxy:secret@localhost:5432/vantaproxy_test
     steps:
       - uses: actions/checkout@v4
 
@@ -108,5 +108,5 @@ jobs:
           context: .
           file: Dockerfile.goreleaser
           push: false
-          tags: crabtrap:ci-test
+          tags: vantaproxy:ci-test
           build-args: TARGETPLATFORM=linux/amd64

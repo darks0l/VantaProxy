@@ -17,10 +17,10 @@ var migrationsFS embed.FS // embeds internal/db/migrations/*.sql
 
 // Migrate runs all SQL migration files in db/migrations/ in lexicographic order.
 // It tracks applied migrations in a schema_migrations table (idempotent).
-// A Postgres advisory lock (keyed on FNV-1a of "crabtrap-migrate") serializes
+// A Postgres advisory lock (keyed on FNV-1a of "vantaproxy-migrate") serializes
 // concurrent callers, e.g. parallel test packages sharing the same database.
 func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
-	// FNV-1a 64-bit hash of "crabtrap-migrate", cast to int64 for pg_advisory_lock.
+	// FNV-1a 64-bit hash of "vantaproxy-migrate", cast to int64 for pg_advisory_lock.
 	const advisoryLockID = int64(5629883934025580048)
 
 	conn, err := pool.Acquire(ctx)

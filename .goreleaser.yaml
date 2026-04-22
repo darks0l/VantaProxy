@@ -9,6 +9,7 @@ builds:
     goos:
       - linux
       - darwin
+      - windows
     goarch:
       - amd64
       - arm64
@@ -18,17 +19,17 @@ builds:
 archives:
   - id: gateway
     ids: [gateway]
-    name_template: "crabtrap_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    name_template: "vanta_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     format_overrides:
       - goos: windows
         formats: [zip]
 
 dockers_v2:
-  - id: crabtrap
+  - id: vantaproxy
     ids: [gateway]
     dockerfile: Dockerfile.goreleaser
     images:
-      - "quay.io/brexhq/crabtrap"
+      - "ghcr.io/darks0l/vantaproxy"
     tags:
       - "v{{ .Version }}"
       - latest
@@ -38,20 +39,20 @@ dockers_v2:
 
 release:
   header: |
-    ## What's New
+    ## VantaProxy — What's New
 
     See the full changelog below for details.
 
     ### Docker
 
     ```
-    docker pull quay.io/brexhq/crabtrap:v{{ .Version }}
+    docker pull ghcr.io/darks0l/vantaproxy:v{{ .Version }}
     ```
 
 changelog:
   use: github
   abbrev: 7
-  format: "[{{ .SHA }}](https://github.com/brexhq/CrabTrap/commit/{{ .SHA }}): {{ .Message }}"
+  format: "[{{ .SHA }}](https://github.com/darks0l/VantaProxy/commit/{{ .SHA }}): {{ .Message }}"
   sort: asc
   groups:
     - title: Features

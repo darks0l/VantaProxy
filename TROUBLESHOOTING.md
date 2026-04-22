@@ -10,7 +10,7 @@ This means the client doesn't trust the proxy's CA certificate.
 
 ```bash
 # Check if CA cert is installed
-security find-certificate -c "CrabTrap CA"
+security find-certificate -c "Vanta CA"
 
 # Check if CA cert exists
 ls -la certs/ca.crt certs/ca.key
@@ -185,7 +185,7 @@ Then restart your browser/application.
 ### "This certificate is not trusted" in browser
 
 1. Open Keychain Access
-2. Search for "CrabTrap CA"
+2. Search for "Vanta CA"
 3. Double-click the certificate
 4. Expand "Trust"
 5. Set "When using this certificate" to "Always Trust"
@@ -320,7 +320,7 @@ pkill -f gateway
 
 # Remove old certificates
 rm certs/ca.key certs/ca.crt
-security delete-certificate -c "CrabTrap CA" 2>/dev/null || true
+security delete-certificate -c "Vanta CA" 2>/dev/null || true
 
 # Regenerate and reinstall
 ./scripts/generate-certs.sh

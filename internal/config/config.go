@@ -25,6 +25,29 @@ type AdminConfig struct {
 }
 
 // Config represents the gateway configuration
+// Web3RPCConfig describes a single allowed RPC endpoint.
+type Web3RPCConfig struct {
+	URL            string    `yaml:"url"`                // e.g. "https://eth.llamarpc.com"
+	ChainID        uint64   `yaml:"chain_id"`          // numeric chain ID (1=mainnet, 8453=base, etc.)
+	ChainName      string   `yaml:"chain_name"`        // human-readable name (optional)
+	Allowlist      []string `yaml:"allowlist"`         // allowed contract addresses (lower-case hex); empty=all
+	Denylist       []string `yaml:"denylist"`          // blocked contract addresses
+	ValueWarnETH  float64  `yaml:"value_warn_eth"`  // warn above this ETH value; 0=disabled
+	ValueDenyETH   float64  `yaml:"value_deny_eth"`  // deny above this ETH value; 0=disabled
+	MaxGasGwei     float64  `yaml:"max_gas_gwei"`     // deny if gas price exceeds this many gwei; 0=disabled
+	Enabled        bool     `yaml:"enabled"`           // default true
+}
+
+// Web3Config contains Web3 security settings.
+type Web3Config struct {
+	Enabled         bool               `yaml:"enabled"`           // enable Web3 security checks
+	LogAllWeb3      bool               `yaml:"log_all_web3"`     // log every Web3 request at info level
+	RPCs            []Web3RPCConfig    `yaml:"rpcs"`             // allowed RPC endpoints
+	AllowedChains   []uint64           `yaml:"allowed_chains"`   // chain IDs allowed for this user; empty=all
+	DeniedChains    []uint64           `yaml:"denied_chains"`    // chain IDs denied for this user
+	DangerDenylist  []string           `yaml:"danger_denylist"`  // additional blocked contract addresses
+}
+
 type Config struct {
 	LogLevel    string            `yaml:"log_level"` // "debug", "info" (default), "warn", "error"
 	Proxy       ProxyConfig       `yaml:"proxy"`
@@ -34,6 +57,7 @@ type Config struct {
 	Database    DatabaseConfig    `yaml:"database"`
 	LLMJudge    LLMJudgeConfig    `yaml:"llm_judge"`
 	Admin       AdminConfig       `yaml:"admin"`
+	Web3        Web3Config        `yaml:"web3"`
 }
 
 // ProxyConfig contains proxy server settings
@@ -247,6 +271,16 @@ func (c *Config) applyDefaults() {
 	if *c.Proxy.RateLimitPerIP > 0 && c.Proxy.RateLimitBurst == 0 {
 		c.Proxy.RateLimitBurst = 100
 	}
+	// Web3 defaults.
+	if c.Web3.RPCs == nil {
+		c.Web3.RPCs = []Web3RPCConfig{}
+	}
+	for i := range c.Web3.RPCs {
+		if c.Web3.RPCs[i].Enabled {
+			continue
+		}
+		c.Web3.RPCs[i].Enabled = true
+	}
 }
 
 // validate checks if the configuration is valid
@@ -324,6 +358,25 @@ func (c *Config) validate() error {
 	}
 	if c.Proxy.RateLimitBurst < 0 {
 		return fmt.Errorf("rate_limit_burst must be non-negative (got %d)", c.Proxy.RateLimitBurst)
+	}
+
+	// Web3 validation.
+	for i, rpc := range c.Web3.RPCs {
+		if !c.Web3.Enabled && i == 0 {
+			break
+		}
+		if rpc.URL == "" {
+			return fmt.Errorf("web3.rpcs[%d].url is required", i)
+		}
+		if rpc.ValueDenyETH < 0 || rpc.ValueWarnETH < 0 {
+			return fmt.Errorf("web3.rpcs[%d]: negative ETH threshold not allowed", i)
+		}
+		if rpc.ValueWarnETH > 0 && rpc.ValueDenyETH > 0 && rpc.ValueWarnETH > rpc.ValueDenyETH {
+			return fmt.Errorf("web3.rpcs[%d]: warn threshold (%.4f) must be <= deny threshold (%.4f)", i, rpc.ValueWarnETH, rpc.ValueDenyETH)
+		}
+		if rpc.MaxGasGwei < 0 {
+			return fmt.Errorf("web3.rpcs[%d].max_gas_gwei must be non-negative", i)
+		}
 	}
 
 	return nil

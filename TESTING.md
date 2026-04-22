@@ -1,6 +1,6 @@
 # Testing Guide
 
-This guide provides step-by-step instructions for testing CrabTrap.
+This guide provides step-by-step instructions for testing Vanta.
 
 ## Prerequisites
 
@@ -83,7 +83,7 @@ You should see:
 Database connected
 Migrations applied
 Starting admin API on port 8081
-Starting CrabTrap on port 8080
+Starting Vanta on port 8080
 Approval timeout: 30s
 Cache TTL: 5m0s
 Cache max uses: 5
@@ -93,7 +93,7 @@ Cache max uses: 5
 
 ```bash
 # Create an admin user with a gateway auth token
-DATABASE_URL=postgres://crabtrap:secret@localhost:$(docker compose port postgres 5432 | cut -d: -f2)/crabtrap \
+DATABASE_URL=postgres://vantaproxy:secret@localhost:$(docker compose port postgres 5432 | cut -d: -f2)/vantaproxy \
   ./gateway create-admin-user testuser
 ```
 
@@ -175,7 +175,7 @@ print(response.json())
 
 ```bash
 # Verify CA cert is installed (macOS)
-security find-certificate -c "CrabTrap CA"
+security find-certificate -c "Vanta CA"
 
 # Verify CA cert is readable
 openssl x509 -in certs/ca.crt -text -noout

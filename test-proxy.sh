@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# CrabTrap - Test Script
+# Vanta - Test Script
 # This script demonstrates the proxy functionality
 
 PROXY_URL="http://localhost:8080"
@@ -9,7 +9,7 @@ ADMIN_URL="http://localhost:8081"
 CA_CERT="./certs/ca.crt"
 
 echo "==================================="
-echo "CrabTrap - Test Script"
+echo "Vanta - Test Script"
 echo "==================================="
 echo ""
 
@@ -51,7 +51,7 @@ echo "Waiting for approval..."
     sleep 2
     curl -x "$PROXY_URL" --cacert "$CA_CERT" -s -X POST https://httpbin.org/post \
         -H "Content-Type: application/json" \
-        -d '{"test": "data", "message": "Hello from CrabTrap"}' \
+        -d '{"test": "data", "message": "Hello from Vanta"}' \
         > /tmp/openclaw-test-response.txt 2>&1
 ) &
 POST_PID=$!
@@ -103,7 +103,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     START=$(date +%s)
     curl -x "$PROXY_URL" --cacert "$CA_CERT" -s -X POST https://httpbin.org/post \
         -H "Content-Type: application/json" \
-        -d '{"test": "data", "message": "Hello from CrabTrap"}' | jq -r '.url' || echo "Request failed"
+        -d '{"test": "data", "message": "Hello from Vanta"}' | jq -r '.url' || echo "Request failed"
     END=$(date +%s)
     DURATION=$((END - START))
     echo "✓ Request completed in ${DURATION}s (should be fast, from cache)"
