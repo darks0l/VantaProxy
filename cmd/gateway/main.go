@@ -22,6 +22,7 @@ import (
 	"github.com/darksol/Vanta/internal/llmpolicy"
 	"github.com/darksol/Vanta/internal/notifications"
 	"github.com/darksol/Vanta/internal/proxy"
+	"github.com/darksol/Vanta/internal/web3"
 )
 
 var (
@@ -102,6 +103,18 @@ func main() {
 
 	// Wire dispatchers.
 	proxyServer.GetAuditLogger().SetDispatcher(dispatcher)
+
+	// Wire Web3Rules if web3 is enabled.
+	var web3Rules *web3.Web3Rules
+	if cfg.Web3.Enabled {
+		web3Rules = web3.NewRules(&cfg.Web3)
+		approvalManager.SetWeb3Rules(web3Rules)
+		slog.Info("web3 security rules enabled",
+			"rpcs", len(cfg.Web3.RPCs),
+			"deny_contracts", len(cfg.Web3.DenyContracts),
+			"allowed_chains", len(cfg.Web3.AllowedChains),
+		)
+	}
 
 	// Wire up LLM judge if enabled.
 	var llmJudge *judge.LLMJudge

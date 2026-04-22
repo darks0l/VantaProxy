@@ -21,6 +21,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/darksol/Vanta/internal/config"
 	"github.com/darksol/Vanta/pkg/types"
 )
 
@@ -136,6 +137,54 @@ type Result struct {
 	Reason   string            // Human-readable explanation.
 	Rule     string            // Which rule matched, e.g. "dangerous_contract", "chain_denied".
 	ApprovedBy string         // "web3" when this result is used directly.
+}
+
+// NewRules builds a Web3Rules from a Web3Config. It applies defaults
+// (DefaultDangerousContracts as base denylist) and converts uint64 chain IDs
+// to web3.ChainID.
+func NewRules(cfg *config.Web3Config) *Web3Rules {
+	if cfg == nil {
+		return &Web3Rules{Enabled: false}
+	}
+
+	rpcs := make([]RPCConfig, 0, len(cfg.RPCs))
+	for _, r := range cfg.RPCs {
+		rpcs = append(rpcs, RPCConfig{
+			URL:          r.URL,
+			ChainID:      ChainID(r.ChainID),
+			Allowlist:    r.Allowlist,
+			Denylist:     r.Denylist,
+			ValueWarnETH: r.ValueWarnETH,
+			ValueDenyETH: r.ValueDenyETH,
+			MaxGasGwei:   r.MaxGasGwei,
+			Enabled:      r.Enabled,
+		})
+	}
+
+	// Base denylist = built-in dangerous contracts + user additions.
+	denylist := make([]string, len(DefaultDangerousContracts))
+	copy(denylist, DefaultDangerousContracts)
+	denylist = append(denylist, cfg.DangerDenylist...)
+
+	return &Web3Rules{
+		Chains: ChainConfig{
+			Allowlist: castChainIDs(cfg.AllowedChains),
+			Denylist:  castChainIDs(cfg.DeniedChains),
+		},
+		RPCs:       rpcs,
+		Denylist:   denylist,
+		Enabled:    cfg.Enabled,
+		LogAllWeb3: cfg.LogAllWeb3,
+	}
+}
+
+// castChainIDs converts []uint64 to []ChainID.
+func castChainIDs(ids []uint64) []ChainID {
+	result := make([]ChainID, len(ids))
+	for i, id := range ids {
+		result[i] = ChainID(id)
+	}
+	return result
 }
 
 // Check evaluates req against the Web3 rules and returns a decision.

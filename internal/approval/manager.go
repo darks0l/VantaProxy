@@ -13,6 +13,7 @@ import (
 	"sync"
 
 	"github.com/darksol/Vanta/internal/judge"
+	"github.com/darksol/Vanta/internal/web3"
 	"github.com/darksol/Vanta/pkg/types"
 )
 
@@ -33,10 +34,10 @@ const ContextKeyOriginalBody contextKey = "original_body"
 
 // Manager orchestrates the approval decision flow
 type Manager struct {
-	judge        *judge.LLMJudge // nil if LLM mode disabled
-	mode         string      // "llm" | "passthrough"
-	fallbackMode string      // "deny" | "passthrough"
-
+	judge        *judge.LLMJudge  // nil if LLM mode disabled
+	web3Rules    *web3.Web3Rules  // nil if web3 disabled
+	mode         string           // "llm" | "passthrough"
+	fallbackMode string           // "deny" | "passthrough"
 }
 
 // NewManager creates a new approval manager.
@@ -59,6 +60,11 @@ func (m *Manager) SetJudge(j *judge.LLMJudge, mode, fallbackMode string) {
 	m.judge = j
 	m.SetMode(mode)
 	m.fallbackMode = fallbackMode
+}
+
+// SetWeb3Rules configures the Web3 security rules engine.
+func (m *Manager) SetWeb3Rules(r *web3.Web3Rules) {
+	m.web3Rules = r
 }
 
 // CheckApproval checks if a request should be allowed.
@@ -136,6 +142,36 @@ func (m *Manager) checkApprovalLLM(ctx context.Context, req *http.Request, reque
 	if policy == nil || policy.Prompt == "" {
 		slog.Debug("LLM mode: no policy in context, using fallback", "request_id", requestID, "fallback", m.fallbackMode)
 		return m.llmFallback(ctx, req, requestID, apiInfo, body)
+	}
+
+	// Web3 deterministic guard — runs before the LLM judge for JSON-RPC requests.
+	// Returns deny immediately if the request violates a web3 rule.
+	if m.web3Rules != nil && isJSONRPCRequest(req) {
+		web3Req := buildWeb3Request(req, body)
+		web3Result := m.web3Rules.Check(web3Req)
+		switch web3Result.Decision {
+		case types.DecisionDeny:
+			slog.Info("web3 rule denied request",
+				"request_id", requestID,
+				"reason", web3Result.Reason,
+				"rule", web3Result.Rule,
+				"url", req.URL.String(),
+			)
+			return types.ApprovalDecision{
+				Decision:    types.DecisionDeny,
+				ApprovedBy:  "web3",
+				Channel:     "web3",
+				Reason:      fmt.Sprintf("web3 rule [%s]: %s", web3Result.Rule, web3Result.Reason),
+				LLMPolicyID: policy.ID,
+			}, body, nil
+		case types.DecisionAllow:
+			slog.Debug("web3 rule allowed request",
+				"request_id", requestID,
+				"reason", web3Result.Reason,
+				"rule", web3Result.Rule,
+			)
+		}
+		// DecisionSkip: continue to LLM judge
 	}
 
 	// Use the original headers/body for LLM evaluation so proxy-internal mutations are not leaked to the judge.
@@ -474,4 +510,37 @@ func judgeResultToLLMResponse(r judge.JudgeResult, err error) *types.LLMResponse
 		lr.Reason = r.Reason
 	}
 	return lr
+}
+
+// isJSONRPCRequest returns true if the request looks like an Ethereum JSON-RPC call.
+func isJSONRPCRequest(req *http.Request) bool {
+	if req.Body == nil {
+		return false
+	}
+	ct := req.Header.Get("Content-Type")
+	if ct != "" && !strings.Contains(ct, "application/json") {
+		return false
+	}
+	// Ethereum JSON-RPC calls are always POST to an RPC endpoint.
+	if req.Method != http.MethodPost {
+		return false
+	}
+	// Heuristic: RPC endpoints commonly have /rpc, /eth, /web3, /jsonrpc in the path,
+	// or are standard port 8545/8546.
+	path := req.URL.Path
+	if strings.Contains(path, "rpc") || strings.Contains(path, "eth") ||
+		strings.Contains(path, "web3") || strings.Contains(path, "jsonrpc") {
+		return true
+	}
+	return false
+}
+
+// buildWeb3Request constructs a web3.Request from an HTTP request + body.
+func buildWeb3Request(req *http.Request, body []byte) *web3.Request {
+	return &web3.Request{
+		Method: req.Method,
+		URL:    req.URL.String(),
+		Header: req.Header,
+		Body:   body,
+	}
 }
