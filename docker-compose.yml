@@ -1,0 +1,32 @@
+services:
+  crabtrap:
+    image: quay.io/brexhq/crabtrap:latest
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      DATABASE_URL: postgres://crabtrap:secret@postgres:5432/crabtrap
+    volumes:
+      - certs:/app/certs
+    depends_on:
+      postgres:
+        condition: service_healthy
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: crabtrap
+      POSTGRES_USER: crabtrap
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crabtrap -d crabtrap"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  certs:
+  postgres_data:

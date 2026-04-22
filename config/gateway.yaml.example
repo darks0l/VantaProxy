@@ -1,0 +1,84 @@
+log_level: info  # debug | info | warn | error
+
+proxy:
+  port: 8080
+  read_timeout: 600s    # 10 minutes for long-polling
+  write_timeout: 600s
+  idle_timeout: 120s
+  # allowed_private_cidrs:   # CIDRs exempted from SSRF protection (default: none)
+  #   - "10.0.0.0/8"         # Example: allow access to internal 10.x network
+  #   - "172.16.5.0/24"      # Example: allow specific subnet
+  # insecure_skip_upstream_verify: false  # DANGEROUS: skip TLS verification for ALL upstreams (default: false)
+  # insecure_skip_verify_hosts:           # Preferred: skip TLS verification only for these hosts
+  #   - "self-signed.internal.example.com"       # bare hostname matches all ports
+  #   - "dev.local:9001"                         # host:port matches only that port
+  rate_limit_per_ip: 50     # Max requests/sec per source IP (default: 50)
+  rate_limit_burst: 100     # Token bucket burst size per IP (default: 100)
+
+tls:
+  ca_cert_path: ./certs/ca.crt
+  ca_key_path: ./certs/ca.key
+  max_cert_cache_size: 10000  # Maximum entries in the per-host TLS certificate LRU cache (default: 10000)
+  # Generate CA certificate using: ./certs/generate.sh
+
+approval:
+  mode: llm             # llm | passthrough (passthrough records audit logs but skips approval blocking)
+  timeout: 30s          # 30 seconds - how long to wait for approval
+  cache_ttl: 300s       # 5 minutes - how long cached approvals are valid
+  cache_max_uses: 5     # Maximum times a cached approval can be used
+
+audit:
+  output: stderr        # stderr (default), stdout, or file path
+  format: json          # Only json is supported
+
+admin:
+  secure_cookie: false  # set true when served behind a TLS-terminating reverse proxy
+
+database:
+  url: "${DATABASE_URL}"  # e.g. postgres://crabtrap:secret@localhost:5432/crabtrap
+  max_conns: 10
+  min_conns: 2
+
+# LLM-as-judge: automatic request approval using a language model.
+# The policy_prompt is configured per-user in the users table in PostgreSQL.
+# Set approval.mode: llm to use the judge for live traffic (default: llm).
+# Set enabled: true independently to initialise LLM components for admin
+# features (evals, policy agent) even when approval.mode is passthrough.
+llm_judge:
+  enabled: true
+  provider: bedrock-anthropic     # "bedrock-anthropic" | "anthropic" | "openai"
+  eval_model: anthropic.claude-opus-4-5-20251101-v2:0
+  fast_model: anthropic.claude-haiku-4-5-20251001
+  thinking_model: anthropic.claude-opus-4-5-20251101-v2:0
+  bedrock_aws_region: us-east-1     # Optional: overrides AWS_REGION env var (bedrock-anthropic only)
+  timeout: 30s
+  fallback_mode: deny             # deny | passthrough
+
+  # --- Provider: bedrock-anthropic (default) ---
+  # Uses AWS credentials from the standard chain: env vars, ~/.aws/credentials, IAM roles.
+  # Model IDs use the Bedrock format, e.g. "anthropic.claude-opus-4-5-20251101-v2:0".
+
+  # --- Provider: anthropic ---
+  # Calls the Anthropic Messages API directly. Requires an API key.
+  # Model IDs use the Anthropic format, e.g. "claude-sonnet-4-20250514".
+  # anthropic_api_key: "${ANTHROPIC_API_KEY}"
+  # anthropic_base_url: https://api.anthropic.com   # optional: override for proxies
+  #
+  # Example:
+  #   provider: anthropic
+  #   eval_model: claude-sonnet-4-20250514
+  #   fast_model: claude-haiku-4-5-20241022
+  #   thinking_model: claude-sonnet-4-20250514
+  #   anthropic_api_key: "${ANTHROPIC_API_KEY}"
+
+  # --- Provider: openai ---
+  # Calls the OpenAI Chat Completions API. Requires an API key.
+  # openai_api_key: "${OPENAI_API_KEY}"
+  # openai_base_url: https://api.openai.com          # optional: override for proxies
+  #
+  # Example:
+  #   provider: openai
+  #   eval_model: gpt-4o
+  #   fast_model: gpt-4o-mini
+  #   thinking_model: gpt-4o
+  #   openai_api_key: "${OPENAI_API_KEY}"

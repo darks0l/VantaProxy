@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# Build artifacts
+gateway
+*.exe
+*.test
+*.out
+
+# Development files
+.buildkite
+.vscode
+.idea
+
+# Test files
+**/*_test.go
+
+# Certificates (generated at runtime or deployment)
+certs/
+
+# Documentation
+*.md
+README.md
+LICENSE
+
+# Web development files (node_modules will be rebuilt in Docker)
+web/node_modules
+web/.vite
+web/dist
+
+# Test scripts
+test-*.sh
+
+# Environment files
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db

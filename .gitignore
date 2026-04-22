@@ -1,0 +1,45 @@
+# Binary
+/gateway
+*.exe
+
+# Certificates directory (contains sensitive keys and is symlinked in worktrees)
+/certs/
+/certs
+
+# Credentials directory (contains OAuth tokens - Phase 4)
+/data/credentials/*.json
+!/data/credentials/*.json.example
+
+# Gateway config (contains secrets - use config/gateway.yaml.example as template)
+/config/gateway.yaml
+
+# Environment variables (contains secrets - use .env.example as template)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.out
+dist/
+build/
+
+# Web UI
+web/node_modules/
+web/dist/
+cmd/gateway/web/dist/
+package-lock.json
+.claude/worktrees/

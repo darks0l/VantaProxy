@@ -1,0 +1,73 @@
+version: 2
+
+builds:
+  - id: gateway
+    main: ./cmd/gateway/
+    binary: gateway
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+
+archives:
+  - id: gateway
+    ids: [gateway]
+    name_template: "crabtrap_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+
+dockers_v2:
+  - id: crabtrap
+    ids: [gateway]
+    dockerfile: Dockerfile.goreleaser
+    images:
+      - "quay.io/brexhq/crabtrap"
+    tags:
+      - "v{{ .Version }}"
+      - latest
+    platforms:
+      - linux/amd64
+      - linux/arm64
+
+release:
+  header: |
+    ## What's New
+
+    See the full changelog below for details.
+
+    ### Docker
+
+    ```
+    docker pull quay.io/brexhq/crabtrap:v{{ .Version }}
+    ```
+
+changelog:
+  use: github
+  abbrev: 7
+  format: "[{{ .SHA }}](https://github.com/brexhq/CrabTrap/commit/{{ .SHA }}): {{ .Message }}"
+  sort: asc
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: Bug Fixes
+      regexp: '^.*?(fix|bug)(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: Security
+      regexp: '^.*?[Ss]ecurity.*$'
+      order: 2
+    - title: Other Changes
+      order: 999
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "Merge pull request"
